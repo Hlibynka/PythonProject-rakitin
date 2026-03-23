@@ -8,3 +8,6 @@ def divide(a: float, b: float) -> float:
     if b == 0:
         raise ValueError("Ділення на нуль неможливе")
     return a / b
+
+def multiply(a: float, b: float) -> float:
+    return a * b

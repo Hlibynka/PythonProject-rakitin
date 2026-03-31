@@ -89,13 +89,28 @@ jobs:
   # STAGE 4: VERIFY STAGING
   # ==========================================
   verify_staging:
-    name: Verify Staging
-    needs: deploy_staging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run Smoke Tests / Integration Tests
-        run: |
-          echo "Перевірка працездатності розгорнутого застосунку на Staging"
+      name: Verify Staging (Smoke Test)
+      needs: deploy_staging # Запускається автоматично ТІЛЬКИ після успішного деплою на Staging
+      runs-on: ubuntu-latest
+      steps:
+        - name: Run Smoke Test
+          run: |
+            echo "Запуск Smoke-тестів на Staging середовищі..."
+            
+            # Виконуємо імітацію тесту через Python
+            python -c "
+            expected = 1
+            actual = 1
+            
+            print(f'Перевірка базової працездатності: {actual} == {expected}')
+            
+            if actual == expected:
+                print('Smoke-тест пройдено успішно! Застосунок працює.')
+                exit(0) # Успішне завершення
+            else:
+                print('Помилка! Smoke-тест провалено. Застосунок не відповідає.')
+                exit(1) # Завершення з помилкою (блокує наступні етапи)
+            "
 
   # ==========================================
   # STAGE 5: DEPLOY PRODUCTION

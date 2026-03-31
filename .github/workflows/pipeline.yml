@@ -119,8 +119,28 @@ jobs:
     name: Deploy to Production
     needs: verify_staging
     runs-on: ubuntu-latest
-    # environment: production # Можна додати для ручного підтвердження (Continuous Delivery)
+
+    environment:
+      name: production
+
     steps:
-      - name: Deploy
+      # 3авантажуємо артефакт зі збіркою
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-app-build
+
+      # 2. Імітуємо фінальний деплой
+      - name: Execute Production Deployment
         run: |
-          echo "Фінальне розгортання на Production сервері для користувачів"
+          echo "РЕЛІЗ! Починаємо деплой на PRODUCTION середовище..."
+          
+          echo "Перевіряємо вміст артефакту перед релізом:"
+          echo "------------------------------------------------"
+          cat build_artifact.txt
+          echo "------------------------------------------------"
+          
+          echo "Застосовуємо нову версію для реальних користувачів..."
+          # Тут була б реальна команда деплою на продакшн-сервер
+          
+          echo "Деплой на Production успішно завершено!"

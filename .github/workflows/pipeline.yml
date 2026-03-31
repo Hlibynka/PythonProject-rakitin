@@ -45,7 +45,16 @@ jobs:
 
       - name: Build step
         run: |
-          echo "Тут відбувається збірка проєкту"
+          echo "Починаємо збірку проєкту..."
+          echo "Збірка успішно виконана. Дата: $(date)" > build_artifact.txt
+          echo "Також додаємо туди наш код" >> build_artifact.txt
+
+      - name: Upload Artifact for Deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-app-build
+          path: build_artifact.txt
+          retention-days: 1
 
   # ==========================================
   # STAGE 3: DEPLOY STAGING

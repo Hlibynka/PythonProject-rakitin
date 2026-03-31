@@ -130,7 +130,7 @@ jobs:
         with:
           name: my-app-build
 
-      # 2. Імітуємо фінальний деплой
+      # Імітуємо фінальний деплой
       - name: Execute Production Deployment
         run: |
           echo "РЕЛІЗ! Починаємо деплой на PRODUCTION середовище..."

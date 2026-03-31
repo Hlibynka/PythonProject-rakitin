@@ -64,9 +64,28 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-app-build # Назва має ТОЧНО збігатися з тією, що в upload-artifact
+
+            # 2. Імітуємо процес деплою, використовуючи цей артефакт
+      - name: Simulate Deployment to Staging
         run: |
-          echo "Розгортання зібраного коду на Staging (тестовий сервер)"
+          echo "Підключення до Staging-сервера..."
+          echo "Перевіряємо завантажені файли:"
+          ls -la
+                
+          echo "------------------------------------------------"
+          echo " Розпакування та читання файлу збірки:"
+          cat build_artifact.txt
+          echo "------------------------------------------------"
+          
+          echo "Копіювання файлів у робочу директорію сервера..."
+
+          scp build_artifact.txt user@staging-server:/var/www/my-app/
+          
+          echo "Деплой на Staging успішно завершено!"
 
   # ==========================================
   # STAGE 4: VERIFY STAGING

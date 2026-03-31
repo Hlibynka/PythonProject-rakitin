@@ -45,7 +45,16 @@ jobs:
 
       - name: Build step
         run: |
-          echo "Тут відбувається збірка проєкту"
+          echo "Починаємо збірку проєкту..."
+          echo "Збірка успішно виконана. Дата: $(date)" > build_artifact.txt
+          echo "Також додаємо туди наш код" >> build_artifact.txt
+
+      - name: Upload Artifact for Deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-app-build
+          path: build_artifact.txt
+          retention-days: 1
 
   # ==========================================
   # STAGE 3: DEPLOY STAGING
@@ -55,21 +64,53 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-app-build # Назва має ТОЧНО збігатися з тією, що в upload-artifact
+
+            # 2. Імітуємо процес деплою, використовуючи цей артефакт
+      - name: Simulate Deployment to Staging
         run: |
-          echo "Розгортання зібраного коду на Staging (тестовий сервер)"
+          echo "Підключення до Staging-сервера..."
+          echo "Перевіряємо завантажені файли:"
+          ls -la
+                
+          echo "------------------------------------------------"
+          echo " Розпакування та читання файлу збірки:"
+          cat build_artifact.txt
+          echo "------------------------------------------------"
+          
+          echo "Копіювання файлів у робочу директорію сервера..."
+          
+          echo "Деплой на Staging успішно завершено!"
 
   # ==========================================
   # STAGE 4: VERIFY STAGING
   # ==========================================
   verify_staging:
-    name: Verify Staging
-    needs: deploy_staging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run Smoke Tests / Integration Tests
-        run: |
-          echo "Перевірка працездатності розгорнутого застосунку на Staging"
+      name: Verify Staging (Smoke Test)
+      needs: deploy_staging # Запускається автоматично ТІЛЬКИ після успішного деплою на Staging
+      runs-on: ubuntu-latest
+      steps:
+        - name: Run Smoke Test
+          run: |
+            echo "Запуск Smoke-тестів на Staging середовищі..."
+            
+            # Виконуємо імітацію тесту через Python
+            python -c "
+            expected = 1
+            actual = 1
+            
+            print(f'Перевірка базової працездатності: {actual} == {expected}')
+            
+            if actual == expected:
+                print('Smoke-тест пройдено успішно! Застосунок працює.')
+                exit(0) # Успішне завершення
+            else:
+                print('Помилка! Smoke-тест провалено. Застосунок не відповідає.')
+                exit(1) # Завершення з помилкою (блокує наступні етапи)
+            "
 
   # ==========================================
   # STAGE 5: DEPLOY PRODUCTION
@@ -78,8 +119,28 @@ jobs:
     name: Deploy to Production
     needs: verify_staging
     runs-on: ubuntu-latest
-    # environment: production # Можна додати для ручного підтвердження (Continuous Delivery)
+
+    environment:
+      name: production
+
     steps:
-      - name: Deploy
+      # 3авантажуємо артефакт зі збіркою
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-app-build
+
+      # 2. Імітуємо фінальний деплой
+      - name: Execute Production Deployment
         run: |
-          echo "Фінальне розгортання на Production сервері для користувачів"
+          echo "РЕЛІЗ! Починаємо деплой на PRODUCTION середовище..."
+          
+          echo "Перевіряємо вміст артефакту перед релізом:"
+          echo "------------------------------------------------"
+          cat build_artifact.txt
+          echo "------------------------------------------------"
+          
+          echo "Застосовуємо нову версію для реальних користувачів..."
+          # Тут була б реальна команда деплою на продакшн-сервер
+          
+          echo "Деплой на Production успішно завершено!"

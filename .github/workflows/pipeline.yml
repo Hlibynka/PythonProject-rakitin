@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13' # Вкажіть версію Python, яка використовується в проєкті
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |
@@ -67,7 +67,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: my-app-build # Назва має ТОЧНО збігатися з тією, що в upload-artifact
+          name: my-app-build
 
             # 2. Імітуємо процес деплою, використовуючи цей артефакт
       - name: Simulate Deployment to Staging
@@ -90,7 +90,7 @@ jobs:
   # ==========================================
   verify_staging:
       name: Verify Staging (Smoke Test)
-      needs: deploy_staging # Запускається автоматично ТІЛЬКИ після успішного деплою на Staging
+      needs: deploy_staging
       runs-on: ubuntu-latest
       steps:
         - name: Run Smoke Test
